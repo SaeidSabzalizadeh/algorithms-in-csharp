@@ -1,12 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Algorithms.Strings.Search
 {
-    public class BoyerMoore
+    public class BoyerMoore : ISearch
     {
-        #region Op1
+
+        public IEnumerable<int> Search(string text, string pattern)
+        {
+            List<int> retVal = new List<int>();
+            int patternLength = pattern.Length;
+            int textLength = text.Length;
+
+            int[] badChar = new int[256];
+
+            BadCharHeuristic(pattern, patternLength, ref badChar);
+
+            int searchIndex = 0;
+            while (searchIndex <= (textLength - patternLength))
+            {
+                int patternIndex = patternLength - 1;
+
+                while (patternIndex >= 0 && pattern[patternIndex] == text[searchIndex + patternIndex])
+                    --patternIndex;
+
+                if (patternIndex < 0)
+                {
+                    retVal.Add(searchIndex);
+                    searchIndex += (searchIndex + patternLength < textLength) ? patternLength - badChar[text[searchIndex + patternLength]] : 1;
+                }
+                else
+                {
+                    searchIndex += Math.Max(1, patternIndex - badChar[text[searchIndex + patternIndex]]);
+                }
+            }
+
+            return retVal.ToArray();
+        }
+
+        private static void BadCharHeuristic(string str, int size, ref int[] badChar)
+        {
+            int i;
+
+            for (i = 0; i < 256; i++)
+                badChar[i] = -1;
+
+            for (i = 0; i < size; i++)
+                badChar[(int)str[i]] = i;
+        }
+
+
+        #region Op2
         private static int[] BuildBadCharTable(char[] needle)
         {
             int[] badShift = new int[256];
@@ -52,7 +96,7 @@ namespace Algorithms.Strings.Search
 
         #endregion
 
-        #region OP2
+        #region OP3
 
         class UnicodeSkipArray
         {
@@ -235,53 +279,6 @@ namespace Algorithms.Strings.Search
 
         #endregion
 
-        #region OP3
-
-        public static int[] SearchString(string str, string pat)
-        {
-            List<int> retVal = new List<int>();
-            int m = pat.Length;
-            int n = str.Length;
-
-            int[] badChar = new int[256];
-
-            BadCharHeuristic(pat, m, ref badChar);
-
-            int s = 0;
-            while (s <= (n - m))
-            {
-                int j = m - 1;
-
-                while (j >= 0 && pat[j] == str[s + j])
-                    --j;
-
-                if (j < 0)
-                {
-                    retVal.Add(s);
-                    s += (s + m < n) ? m - badChar[str[s + m]] : 1;
-                }
-                else
-                {
-                    s += Math.Max(1, j - badChar[str[s + j]]);
-                }
-            }
-
-            return retVal.ToArray();
-        }
-
-        private static void BadCharHeuristic(string str, int size, ref int[] badChar)
-        {
-            int i;
-
-            for (i = 0; i < 256; i++)
-                badChar[i] = -1;
-
-            for (i = 0; i < size; i++)
-                badChar[(int)str[i]] = i;
-        }
-
-
-        #endregion
 
     }
 }
