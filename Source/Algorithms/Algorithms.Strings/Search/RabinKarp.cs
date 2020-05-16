@@ -6,7 +6,8 @@ namespace Algorithms.Strings.Search
     public class RabinKarp : ISearch
     {
 
-        static int primeNumber = 101;
+        readonly static int primeNumber = 101;
+        readonly static int d = 256;
 
         public IEnumerable<int> Search(string text, string pattern)
         {
@@ -123,7 +124,7 @@ namespace Algorithms.Strings.Search
         }
 
 
-        public readonly static int d = 256;
+        
 
         /* pat -> pattern  
             txt -> text  
